@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Employee List</title>
+    <link rel="stylesheet" href="/css/emplist.css">
+</head>
+
+<body>
+
+    <div class="dashboard-wrapper">
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            <a href="/dashboard" class="active">Dashboard</a>
+            <a href="/employees">Employee Management</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/payroll">Payroll Processing</a>
+            <a href="/reports">Reports</a>
+            <a href="/profile">Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
+
+        <div class="main-content">
+
+            <div class="container">
+                <div class="card">
+                    <h2>Employee List</h2>
+                    <a href="/employees/add" class="button">+ Add Employee</a>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Emp ID</th>
+                                <th>Full Name</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Salary</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="emp : ${employees}">
+                                <td th:text="${emp.id}"></td>
+                                <td th:text="${emp.empId}"></td>
+                                <td th:text="${emp.fullName}"></td>
+                                <td th:text="${emp.department}"></td>
+                                <td th:text="${emp.designation}"></td>
+                                <td th:text="${emp.basicSalary}"></td>
+                                <td>
+                                    <a th:href="@{/employees/edit/{id}(id=${emp.id})}" class="button">Edit</a>
+                                    <a th:href="@{/employees/delete/{id}(id=${emp.id})}" class="button delete"
+                                        onclick="return confirm('Are you sure?');">Delete</a>
+                                </td>
+                            </tr>
+                            <tr th:if="${employees.isEmpty()}">
+                                <td colspan="7" style="text-align:center;">No employees found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

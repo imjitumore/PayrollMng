@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+        <link rel="stylesheet" href="/css/dashboard.css">
+
+</head>
+<body>
+<div class="dashboard-wrapper">
+
+    <!-- Sidebar menu -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <a href="/dashboard" class="active">Dashboard</a>
+        <a href="/employees">Employee Management</a>
+        <a href="/attendance">Attendance</a>
+        <a href="/payroll">Payroll Processing</a>
+        <a href="/reports">Reports</a>
+        <a href="/profile">Profile</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <h1>Dashboard</h1>
+
+        <!-- Stats cards -->
+        <div class="stats-container">
+            <div class="stats-card">
+                Total Employees
+                <b th:text="${totalEmployees}">0</b>
+            </div>
+            <div class="stats-card">
+                Total Attendance Records
+                <b th:text="${totalAttendance}">0</b>
+            </div>
+            <div class="stats-card">
+                Total Payrolls
+                <b th:text="${totalPayrolls}">0</b>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+</body>
+</html>

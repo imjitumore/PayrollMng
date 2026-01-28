@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Add/Edit Employee</title>
+    <link rel="stylesheet" href="/css/empForm.css">
+</head>
+
+<body>
+
+    <div class="dashboard-wrapper">
+
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            <a href="/dashboard" class="active">Dashboard</a>
+            <a href="/employees" >Employee Management</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/payroll">Payroll Processing</a>
+            <a href="/reports">Reports</a>
+            <a href="/profile">Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
+
+         <div class="main-content">
+        <div class="container">
+            <div class="card">
+                <h2 th:text="${employee.id == null ? 'Add Employee' : 'Edit Employee'}"></h2>
+
+                <form th:action="@{/employees/save}" th:object="${employee}" method="post">
+                    <input type="hidden" th:field="*{id}">
+
+                    <label>Employee ID</label>
+                    <input type="text" th:field="*{empId}" required>
+
+                    <label>Full Name</label>
+                    <input type="text" th:field="*{fullName}" required>
+
+                    <label>Department</label>
+                    <input type="text" th:field="*{department}">
+
+                    <label>Designation</label>
+                    <input type="text" th:field="*{designation}">
+
+                    <label>Basic Salary</label>
+                    <input type="number" th:field="*{basicSalary}" step="0.01">
+
+                    <button type="submit">Save Employee</button>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Reports Dashboard</title>
+    <link rel="stylesheet" href="/css/reports.css">
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/employees">Employee Management</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/payroll">Payroll Processing</a>
+            <a href="/reports" class="active">Reports</a>
+            <a href="/profile">Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
+
+        <div class="main-content">
+            <h2>Reports Dashboard</h2>
+
+            <div class="tabs">
+                <a th:href="@{/reports(activeTab='employees')}" class="tab"
+                    th:classappend="${activeTab == 'employees'} ? 'active-tab'">
+                    Employee List
+                </a>
+
+                <a th:href="@{/reports(activeTab='attendance')}" class="tab"
+                    th:classappend="${activeTab == 'attendance'} ? 'active-tab'">
+                    Monthly Attendance
+                </a>
+
+                <a th:href="@{/reports(activeTab='salary')}" class="tab"
+                    th:classappend="${activeTab == 'salary'} ? 'active-tab'">
+                    Salary Slip
+                </a>
+            </div>
+
+            <!-- ================= Employee List ================= -->
+            <div th:if="${activeTab == 'employees'}" class="tab-content show">
+                <h3>Employee List</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Emp ID</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="emp : ${employees}">
+                            <td th:text="${emp.empId}"></td>
+                            <td th:text="${emp.fullName}"></td>
+                            <td th:text="${emp.department}"></td>
+                            <td th:text="${emp.designation}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p th:if="${#lists.isEmpty(employees)}">No employees found</p>
+            </div>
+
+            <!-- ================= Monthly Attendance ================= -->
+            <!-- ================= Monthly Attendance ================= -->
+            <div th:if="${activeTab == 'attendance'}" class="tab-content show">
+                <h3>Monthly Attendance</h3>
+
+                <form th:action="@{/reports/attendance}" method="get" class="form-row">
+                    <div>
+                        <label>Employee ID</label>
+                        <input type="text" name="empId" th:value="${selectedEmpId}" required>
+                    </div>
+
+                    <div>
+                        <label>Month</label>
+                        <input type="month" name="month" th:value="${selectedMonth}" required>
+                    </div>
+
+                    <button type="submit">View</button>
+                </form>
+
+                <!-- ✅ RESULT TABLE -->
+                <table th:if="${monthView != null and !#lists.isEmpty(monthView)}"
+                    style="margin-top:20px;width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${monthView}">
+                            <td th:text="${row.date}"></td>
+                            <td th:text="${row.status}" th:style="${row.status == 'Pending'} ?
+                'color:red;font-weight:bold;' :
+                'color:green;font-weight:bold;'">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p th:if="${monthView == null or #lists.isEmpty(monthView)}" style="margin-top:15px;color:#6b7280;">
+                    Submit form to view attendance
+                </p>
+            </div>
+
+
+            <!-- ================= Salary Slip ================= -->
+            <div th:if="${activeTab == 'salary'}" class="tab-content show">
+                <h3>Salary Slip</h3>
+
+                <form th:action="@{/reports/salary}" method="get" class="form-row">
+                    <div>
+                        <label>Employee ID</label>
+                        <input type="text" name="empId" required>
+                    </div>
+
+                    <div>
+                        <label>Month</label>
+                        <input type="month" name="month" required>
+                    </div>
+
+                    <button type="submit">View Salary Slip</button>
+                </form>
+
+                <div th:if="${payroll != null}" class="salary-slip-preview">
+                    <table class="salary-table">
+                        <tr>
+                            <th>Employee ID</th>
+                            <td th:text="${payroll.empId}"></td>
+                        </tr>
+                        <tr>
+                            <th>Month</th>
+                            <td th:text="${payroll.month}"></td>
+                        </tr>
+                        <tr>
+                            <th>Basic Salary</th>
+                            <td th:text="${payroll.basicSalary}"></td>
+                        </tr>
+                        <tr>
+                            <th>Allowances</th>
+                            <td th:text="${payroll.allowances}"></td>
+                        </tr>
+                        <tr>
+                            <th>Deductions</th>
+                            <td th:text="${payroll.deductions}"></td>
+                        </tr>
+                        <tr class="net-salary">
+                            <th>Net Salary</th>
+                            <td th:text="${payroll.netSalary}"></td>
+                        </tr>
+                    </table>
+
+                    <a class="download-pdf-btn"
+                        th:href="@{/reports/salary/pdf(empId=${selectedEmpId},month=${selectedMonth})}">
+                        📄 Download PDF
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

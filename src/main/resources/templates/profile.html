@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Admin Profile</title>
+    <link rel="stylesheet" href="/css/profile.css">
+</head>
+
+<body>
+
+
+    <div class="dashboard-wrapper">
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            <a href="/dashboard" class="active">Dashboard</a>
+            <a href="/employees">Employee Management</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/payroll">Payroll Processing</a>
+            <a href="/reports">Reports</a>
+            <a href="/profile">Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
+
+        <div class="main-content">
+
+
+            <div class="profile-container">
+
+                <h2>Admin Profile</h2>
+
+                <!-- PENCIL ICON TOP-RIGHT -->
+                <div class="edit-icon-top">✎</div>
+
+                <!-- PROFILE IMAGE -->
+                <!-- <div class="profile-image-container">
+                    <img id="profileImg"
+                        th:src="${user.profileImage != null ? '/uploads/profile/' + user.profileImage : '/images/default-user.png'}"
+                        class="profile-image">
+                </div> -->
+
+                <!-- PROFILE FORM -->
+                <form id="editForm" enctype="multipart/form-data">
+                    <!-- <input type="file" name="image" id="image-upload" hidden> -->
+
+                    <label>Username</label>
+                    <input type="text" name="username" th:value="${user.username}" readonly>
+
+                    <label>Contact</label>
+                    <input type="text" name="contact" th:value="${user.contact}" readonly>
+
+                    <label>Address</label>
+                    <textarea name="address" readonly th:text="${user.address}"></textarea>
+
+                    <button type="submit" style="display:none;">Update</button>
+                </form>
+
+                <!-- <p class="success"></p>
+                <p class="error"></p> -->
+
+            </div>
+
+
+        </div>
+    </div>
+    <script>
+        // const profileImg = document.getElementById('profileImg');
+        const imageInput = document.getElementById('image-upload');
+        const editIcon = document.querySelector('.edit-icon-top');
+        const editForm = document.getElementById('editForm');
+        const inputs = editForm.querySelectorAll('input[type=text], textarea');
+        const submitBtn = editForm.querySelector('button');
+
+        // Click image → open file picker
+        // profileImg.addEventListener('click', () => imageInput.click());
+
+        // Pencil icon → enable editing
+        editIcon.addEventListener('click', () => {
+            inputs.forEach(i => i.removeAttribute('readonly'));
+            submitBtn.style.display = 'block';
+        });
+
+        // AJAX form submit
+        editForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const formData = new FormData(editForm);
+
+            fetch('/profile/update', {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => res.json())
+                .then(user => {
+                    if (!user) return;
+
+                    inputs[0].value = user.username;
+                    inputs[1].value = user.contact;
+                    inputs[2].value = user.address;
+
+                    // if (user.profileImage) {
+                    //     profileImg.src = '/uploads/profile/' + user.profileImage + '?t=' + new Date().getTime();
+                    // }
+
+                    inputs.forEach(i => i.setAttribute('readonly', true));
+                    submitBtn.style.display = 'none';
+                });
+        });
+    </script>
+
+</body>
+
+</html>
