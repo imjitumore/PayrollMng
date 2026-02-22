@@ -4,6 +4,7 @@
 <head>
     <title>Attendance</title>
     <link rel="stylesheet" href="/css/attendance.css">
+
     <style>
         table {
             width: 100%;
@@ -11,8 +12,7 @@
             margin-top: 20px;
         }
 
-        th,
-        td {
+        th, td {
             padding: 10px;
             border-bottom: 1px solid #ddd;
             text-align: left;
@@ -35,16 +35,41 @@
             cursor: pointer;
         }
 
-        .date-form {
-            margin-bottom: 20px;
+        button:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+
+        .holiday-message {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .pending {
+            color: red;
+            font-weight: bold;
+        }
+
+        .holiday {
+            color: blue;
+            font-weight: bold;
+        }
+
+        .present {
+            color: green;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="dashboard-wrapper" >
-        <div class="sidebar" >
+
+
+
+    <div class="dashboard-wrapper">
+
+        <div class="sidebar">
             <h2>Admin Panel</h2>
             <a href="/dashboard" class="active">Dashboard</a>
             <a href="/employees" >Employee Management</a>
@@ -55,120 +80,109 @@
             <a href="/logout">Logout</a>
         </div>
 
+         <div class="main-content">
+      
+<div class="container">
+    <h2>Attendance for <span th:text="${today}"></span></h2>
 
-        <div class="main-content">
-
-
-        <div class="container">
-            <h2>Attendance for <span th:text="${today}"></span></h2>
-
-            <!-- Date Filter -->
-            <form class="date-form" method="get" action="/attendance">
-                <label>Select Date:</label>
-                <input type="date" name="date" th:value="${today}">
-                <button type="submit">Show</button>
-            </form>
-
-            <!-- Attendance Table -->
-            <form method="post" action="/attendance/save">
-                <input type="hidden" name="date" th:value="${today}">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Emp ID</th>
-                            <th>Full Name</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="emp : ${employees}">
-                            <td th:text="${emp.empId}"></td>
-                            <td th:text="${emp.fullName}"></td>
-                            <td>
-                                <div th:if="${attendanceMap[emp.empId] != null}">
-                                    <!-- Show already filled status -->
-                                    <span th:text="${attendanceMap[emp.empId].status}"></span>
-                                </div>
-                                <div th:if="${attendanceMap[emp.empId] == null}">
-                                    <!-- Show select dropdown if attendance not filled -->
-                                    <select name="status" required>
-                                        <option value="">--Select--</option>
-                                        <option value="Present">Present</option>
-                                        <option value="Absent">Absent</option>
-                                        <option value="Leave">Leave</option>
-                                    </select>
-                                    <input type="hidden" name="empId" th:value="${emp.empId}">
-                                    <input type="hidden" name="employeeName" th:value="${emp.fullName}">
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <br>
-                <button type="submit">Save All</button>
-            </form>
-        </div>
-
-
-        <!-- ================= Employee Attendance Filter Panel ================= -->
-        <div class="container" style="margin-top:40px;">
-
-            <h3>Employee Monthly Attendance</h3>
-
-            <form class="formData" method="get" action="/attendance">
-
-                <div>
-                    <label>Employee ID:</label>
-                    <input type="text" name="empId" required>
-                </div>
-
-                <div>
-                    <label>Month:</label>
-                    <input type="month" name="month" required>
-                </div>
-
-                <div>
-                    <button type="submit">View</button>
-                </div>
-
-            </form>
-
-
-
-
-            <!-- RESULT TABLE -->
-            <div class="result" th:if="${monthView != null}">
-                <h4>
-                    Employee:
-                    <span th:text="${selectedEmpId}"></span>
-                    | Month:
-                    <span th:text="${selectedMonth}"></span>
-                </h4>
-
-                <table border="1" width="100%" style="margin-top:10px;">
-                    <tr>
-                        <th>Date</th>
-                        <th>Status</th>
-                    </tr>
-
-                    <tr th:each="row : ${monthView}">
-                        <td th:text="${row.date}"></td>
-
-                        <td th:text="${row.status}" th:style="${row.status == 'Pending'} ?
-                          'color:red;font-weight:bold;' :
-                          'color:green;'">
-                        </td>
-                    </tr>
-                </table>
-            </div>
-
-
-
-        </div>
-
-        </div>
-
+    <div th:if="${isSunday}" class="holiday-message">
+        Today is Sunday - Holiday. Attendance cannot be marked.
     </div>
-</body>
 
+    <form method="get" action="/attendance">
+        <input type="date" name="date" th:value="${today}">
+        <button type="submit">Show</button>
+    </form>
+
+    <form method="post" action="/attendance/save">
+        <input type="hidden" name="date" th:value="${today}">
+
+        <table>
+            <tr>
+                <th>Emp ID</th>
+                <th>Name</th>
+                <th>Status</th>
+            </tr>
+
+            <tr th:each="emp : ${employees}">
+                <td th:text="${emp.empId}"></td>
+                <td th:text="${emp.fullName}"></td>
+
+                <td>
+                    <div th:if="${attendanceMap[emp.empId] != null}">
+                        <span th:text="${attendanceMap[emp.empId].status}"></span>
+                    </div>
+
+                    <div th:if="${attendanceMap[emp.empId] == null}">
+
+                        <div th:if="${isSunday}">
+                            <span class="holiday">Holiday</span>
+                        </div>
+
+                        <div th:if="${!isSunday}">
+                            <select name="status" required>
+                                <option value="">--Select--</option>
+                                <option value="Present">Present</option>
+                                <option value="Absent">Absent</option>
+                                <option value="Leave">Leave</option>
+                            </select>
+
+                            <input type="hidden" name="empId" th:value="${emp.empId}">
+                            <input type="hidden" name="employeeName" th:value="${emp.fullName}">
+                        </div>
+
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <br>
+        <button type="submit" th:disabled="${isSunday}">Save All</button>
+    </form>
+
+    <!-- ================= MONTH VIEW ================= -->
+
+    <h3>Monthly Attendance</h3>
+
+    <form method="get" action="/attendance">
+        <input type="text" name="empId" placeholder="Employee ID" required>
+        <input type="month" name="month" required>
+        <button type="submit">View</button>
+    </form>
+
+    <div th:if="${monthView != null}">
+        <h4>
+            Employee:
+            <span th:text="${selectedEmpId}"></span>
+            |
+            Month:
+            <span th:text="${selectedMonth}"></span>
+        </h4>
+
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+
+            <tr th:each="row : ${monthView}">
+                <td th:text="${row.date}"></td>
+
+                <td th:text="${row.status}"
+                    th:classappend="${row.status == 'Pending'} ? 'pending' :
+                                    (${row.status == 'Holiday'} ? 'holiday' : 'present')">
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+        </div>
+    </div>
+
+
+
+
+</body>
 </html>
