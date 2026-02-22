@@ -87,7 +87,7 @@ public class ReportsController {
 
             String status;
 
-            // ✅ Sunday Auto Holiday
+            // Sunday Auto Holiday
             if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
                 status = "Holiday";
             } else {
@@ -116,47 +116,17 @@ public class ReportsController {
                              @RequestParam String month,
                              Model model) {
 
-        // ✅ USE findByEmpId (Correct for your structure)
-        Optional<Employee> empOpt = employeeRepo.findByEmpId(empId);
+        Optional<Payroll> payrollOpt =
+                payrollRepo.findByEmpIdAndMonth(empId, month);
 
-        if (empOpt.isEmpty()) {
-            model.addAttribute("error", "Employee not found");
-            return "redirect:/reports?activeTab=salary";
+        if (payrollOpt.isEmpty()) {
+            model.addAttribute("error",
+                    "Payroll not generated for this employee and month.");
+            model.addAttribute("payroll", null);
+        } else {
+            model.addAttribute("payroll", payrollOpt.get());
         }
 
-        Employee emp = empOpt.get();
-
-        YearMonth ym = YearMonth.parse(month);
-        LocalDate start = ym.atDay(1);
-        LocalDate end = ym.atEndOfMonth();
-
-        List<Attendance> records =
-                attendanceRepo.findByEmpIdAndDateBetween(empId, start, end);
-
-        int absentDays = 0;
-
-        for (Attendance a : records) {
-            if ("Absent".equalsIgnoreCase(a.getStatus())) {
-                absentDays++;
-            }
-        }
-
-        double basicSalary = emp.getBasicSalary();
-        double dailySalary = basicSalary / 30.0;
-
-        double deductions = absentDays * dailySalary;
-        double allowances = basicSalary * 0.20;
-        double netSalary = basicSalary + allowances - deductions;
-
-        Payroll payroll = new Payroll();
-        payroll.setEmpId(empId);
-        payroll.setMonth(month);
-        payroll.setBasicSalary(basicSalary);
-        payroll.setAllowances(allowances);
-        payroll.setDeductions(deductions);
-        payroll.setNetSalary(netSalary);
-
-        model.addAttribute("payroll", payroll);
         model.addAttribute("employees", Collections.emptyList());
         model.addAttribute("monthView", Collections.emptyList());
         model.addAttribute("selectedEmpId", empId);
@@ -166,4 +136,60 @@ public class ReportsController {
         return "reports/reports-dashboard";
     }
 
+    // ================= DOWNLOAD SALARY PDF =================
+    @GetMapping("/salary/pdf")
+    public ResponseEntity<byte[]> downloadSalaryPdf(
+            @RequestParam String empId,
+            @RequestParam String month) {
+
+        Optional<Payroll> payrollOpt =
+                payrollRepo.findByEmpIdAndMonth(empId, month);
+
+        if (payrollOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Payroll payroll = payrollOpt.get();
+
+        String htmlContent = generateSalaryHtml(payroll);
+        byte[] contents = htmlContent.getBytes(StandardCharsets.UTF_8);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData(
+                "attachment",
+                "salary-slip-" + empId + "-" + month + ".pdf");
+
+        return new ResponseEntity<>(contents, headers, HttpStatus.OK);
+    }
+
+    // ================= HTML GENERATOR =================
+    private String generateSalaryHtml(Payroll payroll) {
+
+        return """
+            <html>
+            <body style="font-family:Arial;padding:40px;">
+                <h2>Salary Slip</h2>
+                <hr>
+                <p><strong>Employee ID:</strong> %s</p>
+                <p><strong>Month:</strong> %s</p>
+                <p><strong>Basic Salary:</strong> ₹%.2f</p>
+                <p><strong>Allowances:</strong> ₹%.2f</p>
+                <p><strong>Deductions:</strong> ₹%.2f</p>
+                <hr>
+                <h3>Net Salary: ₹%.2f</h3>
+                <br>
+                <p>Generated on: %s</p>
+            </body>
+            </html>
+            """.formatted(
+                payroll.getEmpId(),
+                payroll.getMonth(),
+                payroll.getBasicSalary(),
+                payroll.getAllowances(),
+                payroll.getDeductions(),
+                payroll.getNetSalary(),
+                LocalDate.now()
+        );
+    }
 }
