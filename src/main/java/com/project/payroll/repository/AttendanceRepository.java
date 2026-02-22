@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import com.project.payroll.entity.Attendance;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
@@ -15,7 +14,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             LocalDate end
     );
 
-     List<Attendance> findByDate(LocalDate date);
+    List<Attendance> findByDate(LocalDate date);
 
     Attendance findByEmpIdAndDate(String empId, LocalDate date);
 }

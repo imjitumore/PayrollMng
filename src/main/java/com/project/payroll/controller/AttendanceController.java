@@ -24,11 +24,15 @@ public class AttendanceController {
     private final EmployeeService employeeService;
     private final AttendanceService attendanceService;
 
+
     public AttendanceController(EmployeeService employeeService,
                                 AttendanceService attendanceService) {
         this.employeeService = employeeService;
         this.attendanceService = attendanceService;
     }
+
+
+    
 
     @GetMapping
     public String attendancePage(
@@ -51,7 +55,6 @@ public class AttendanceController {
         }
         model.addAttribute("attendanceMap", attendanceMap);
 
-        // ================= MONTH VIEW =================
         if (empId != null && month != null && !empId.isBlank()) {
 
             YearMonth ym = YearMonth.parse(month);
@@ -91,10 +94,7 @@ public String saveAttendance(
         @RequestParam(value = "status", required = false) List<String> statuses,
         @RequestParam("date") String date) {
 
-    System.out.println("=== DEBUG SAVE ===");
-    System.out.println("empIds: " + empIds);
-    System.out.println("statuses: " + statuses);
-    
+
     LocalDate selectedDate = LocalDate.parse(date);
     
     if (empIds != null && statuses != null) {
