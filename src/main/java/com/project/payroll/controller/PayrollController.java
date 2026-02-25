@@ -3,6 +3,8 @@ package com.project.payroll.controller;
 import com.project.payroll.entity.Payroll;
 import com.project.payroll.service.PayrollService;
 
+import com.project.payroll.entity.User;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +32,15 @@ public class PayrollController {
     public String generate(
             @RequestParam String empId,
             @RequestParam String month,
+            HttpSession session,
             Model model) {
+
+        User current = (User) session.getAttribute("user");
+        if (current != null && current.getEmpId() != null && !current.getEmpId().equals(empId)) {
+            model.addAttribute("error", "Not authorized to view other employee salary");
+            model.addAttribute("payroll", null);
+            return "payroll";
+        }
 
         Payroll payroll = payrollService.generateSalarySlip(empId, month);
 

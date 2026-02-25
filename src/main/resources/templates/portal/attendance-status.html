@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Attendance Status</title>
+    <link rel="stylesheet" href="/css/attendance.css">
+</head>
+<body>
+<div class="dashboard-wrapper">
+    <div class="sidebar">
+        <h2>Employee Portal</h2>
+        <a href="/portal">Home</a>
+        <a href="/portal/apply-leave">Apply for Leave</a>
+        <a href="/portal/leave-list">My Leave Requests</a>
+        <a href="/portal/attendance-status" class="active">Attendance Status</a>
+        <a href="/portal/salary">Salary Slip</a>
+        <a href="/profile">Profile</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+    <div class="main-content">
+        <h1>Monthly Attendance</h1>
+        <form method="post" th:action="@{/portal/attendance-status}">
+            <input type="hidden" name="empId" th:value="${empId}" readonly />
+            <label>Month:</label>
+            <input type="month" name="month" required />
+            <button type="submit">Show</button>
+        </form>
+
+        <table th:if="${dayStatuses}">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="ds : ${dayStatuses}">
+                <td th:text="${ds.date}"></td>
+                <td th:text="${ds.status}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Salary Slip</title>
+    <link rel="stylesheet" href="/css/payroll.css">
+</head>
+<body>
+<div class="dashboard-wrapper">
+    <div class="sidebar">
+        <h2>Employee Portal</h2>
+        <a href="/portal">Home</a>
+        <a href="/portal/apply-leave">Apply for Leave</a>
+        <a href="/portal/leave-list">My Leave Requests</a>
+        <a href="/portal/attendance-status">Attendance Status</a>
+        <a href="/portal/salary" class="active">Salary Slip</a>
+        <a href="/profile">Profile</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div class="payroll-page">
+            <div class="payroll-card">
+                <h2 class="payroll-title">View Salary Slip</h2>
+                <form class="payroll-form"
+                      th:action="@{/portal/salary/generate}"
+                      method="post">
+
+                    <div class="flexClass">
+                        <div class="form-group">
+                            <label>Employee ID</label>
+                            <input type="text" name="empId" th:value="${empId}" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label>Month</label>
+                            <input type="month" name="month" required />
+                        </div>
+                    </div>
+
+                    <button class="generate-btn" type="submit">
+                        Generate Salary Slip
+                    </button>
+                </form>
+                <p class="error-text" th:text="${error}"></p>
+            </div>
+
+            <div class="payslip-page" th:if="${payroll != null}">
+                <div class="payslip">
+                    <div class="payslip-header">
+                        <h2>Salary Slip</h2>
+                        <p class="company-name">ABC Technologies Pvt. Ltd.</p>
+                    </div>
+                    <table class="payslip-table">
+                        <tr><td>Employee ID</td><td th:text="${payroll.empId}"></td></tr>
+                        <tr><td>Month</td><td th:text="${payroll.month}"></td></tr>
+                        <tr><td>Basic Salary</td><td th:text="${payroll.basicSalary}"></td></tr>
+                        <tr><td>Allowances</td><td th:text="${payroll.allowances}"></td></tr>
+                        <tr><td>Deductions</td><td th:text="${payroll.deductions}"></td></tr>
+                        <tr class="net-row"><td>Net Salary</td><td th:text="${payroll.netSalary}"></td></tr>
+                    </table>
+                    <div class="payslip-footer">
+                        <p>This is a system generated salary slip.</p>
+                        <p>Authorized Signatory</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

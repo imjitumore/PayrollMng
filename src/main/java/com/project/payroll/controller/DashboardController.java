@@ -17,8 +17,8 @@ public class DashboardController {
     private final PayrollService payrollService;
 
     public DashboardController(EmployeeService employeeService,
-                               AttendanceService attendanceService,
-                               PayrollService payrollService) {
+            AttendanceService attendanceService,
+            PayrollService payrollService) {
         this.employeeService = employeeService;
         this.attendanceService = attendanceService;
         this.payrollService = payrollService;
@@ -31,6 +31,11 @@ public class DashboardController {
 
         if (user == null) {
             return "redirect:/login";
+        }
+
+        // if an employee is using the system, forward to the portal instead
+        if (user.getEmpId() != null) {
+            return "redirect:/portal";
         }
 
         model.addAttribute("totalEmployees", employeeService.getAll().size());

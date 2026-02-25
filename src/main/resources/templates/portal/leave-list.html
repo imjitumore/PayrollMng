@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Leaves</title>
+    <link rel="stylesheet" href="/css/attendance.css">
+</head>
+<body>
+<div class="dashboard-wrapper">
+    <div class="sidebar">
+        <h2>Employee Portal</h2>
+        <a href="/portal">Home</a>
+        <a href="/portal/apply-leave">Apply for Leave</a>
+        <a href="/portal/leave-list" class="active">My Leave Requests</a>
+        <a href="/portal/attendance-status">Attendance Status</a>
+        <a href="/portal/salary">Salary Slip</a>
+        <a href="/profile">Profile</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+    <div class="main-content">
+        <h1>Leave Requests</h1>
+        <table>
+            <thead>
+            <tr>
+                <th>From</th>
+                <th>To</th>
+                <th>Type</th>
+                <th>Duration</th>
+                <th>Reason</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="l : ${leaves}">
+                <td th:text="${l.fromDate}"></td>
+                <td th:text="${l.toDate}"></td>
+                <td th:text="${l.leaveType}"></td>
+                <td th:text="${l.duration}"></td>
+                <td th:text="${l.reason}"></td>
+                <td th:text="${l.status}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

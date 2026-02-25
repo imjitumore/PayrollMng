@@ -1,8 +1,12 @@
 package com.project.payroll.controller;
 
 import com.project.payroll.entity.Employee;
+import com.project.payroll.entity.User;
 import com.project.payroll.service.EmployeeService;
-
+import com.project.payroll.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +16,18 @@ import org.springframework.web.bind.annotation.*;
 public class EmployeeController {
 
     private final EmployeeService service;
+    private final UserService userService;
 
-    public EmployeeController(EmployeeService service) {
+    @Value("${app.default-password:company123}")
+    private String defaultPassword;
+
+    @Autowired
+    private BCryptPasswordEncoder encoder;
+
+    public EmployeeController(EmployeeService service,
+            UserService userService) {
         this.service = service;
+        this.userService = userService;
     }
 
     // LIST EMPLOYEES
@@ -42,7 +55,7 @@ public class EmployeeController {
     // SAVE (ADD OR EDIT)
     @PostMapping("/save")
     public String save(@ModelAttribute Employee emp) {
-        service.save(emp);
+        service.save(emp); // creation of the corresponding User is handled in service
         return "redirect:/employees";
     }
 
