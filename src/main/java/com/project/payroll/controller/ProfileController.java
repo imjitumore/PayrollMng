@@ -60,8 +60,11 @@ public class ProfileController {
             userToDisplay = userOpt.get();
         }
 
+        // whether the logged‑in user is an employee (empId set) helps template choose portal vs admin sidebar
+        boolean currentUserIsEmployee = sessionUser.getEmpId() != null;
         model.addAttribute("user", userToDisplay);
         model.addAttribute("viewingEmployee", viewingEmployee);
+        model.addAttribute("currentUserIsEmployee", currentUserIsEmployee);
         return "profile";
     }
 

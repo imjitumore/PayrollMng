@@ -4,14 +4,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Admin Profile</title>
+    <title>Profile</title>
     <link rel="stylesheet" href="/css/profile.css">
 </head>
 
 <body>
 
     <div class="dashboard-wrapper">
-        <div class="sidebar">
+        <!-- admin sidebar shown when current user is NOT an employee -->
+        <div class="sidebar" th:if="${!currentUserIsEmployee}">
             <h2>Admin Panel</h2>
             <a th:href="@{/dashboard}" class="active">Dashboard</a>
             <a href="/employees">Employee Management</a>
@@ -21,11 +22,22 @@
             <a href="/profile">Profile</a>
             <a href="/logout">Logout</a>
         </div>
+        <!-- employee portal sidebar for employees viewing their own profile -->
+        <div class="sidebar" th:if="${currentUserIsEmployee}">
+            <h2>Employee Portal</h2>
+            <a href="/portal">Home</a>
+            <a href="/portal/apply-leave">Apply for Leave</a>
+            <a href="/portal/leave-list">My Leave Requests</a>
+            <a href="/portal/attendance-status">Attendance Status</a>
+            <a href="/portal/salary">Salary Slip</a>
+            <a href="/profile">Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
 
         <div class="main-content">
             <div class="profile-container">
                 <h2 th:if="${viewingEmployee}">Employee Profile</h2>
-                <h2 th:if="${!viewingEmployee}">Admin Profile</h2>
+                <h2 th:if="${!viewingEmployee}">My Profile</h2>
 
                 <!-- PENCIL ICON TOP-RIGHT - Only show if viewing own profile -->
                 <div class="edit-icon-top" th:if="${!viewingEmployee}">✎</div>
@@ -35,8 +47,9 @@
                     <label>Username</label>
                     <input type="text" name="username" th:value="${user.username}" readonly>
 
-                    <label>Employee ID</label>
-                    <input type="text" name="empId" th:value="${user.empId}" readonly>
+                    <!-- show empId input only when user record actually has one (admin owns no empId) -->
+                    <label th:if="${user.empId != null}">Employee ID</label>
+                    <input th:if="${user.empId != null}" type="text" name="empId" th:value="${user.empId}" readonly>
 
                     <label>Contact</label>
                     <input type="text" name="contact" th:value="${user.contact}" readonly>
@@ -58,6 +71,10 @@
     <script>
         const editIcon = document.querySelector('.edit-icon-top');
         const editForm = document.getElementById('editForm');
+        const usernameInput = editForm.querySelector('[name=username]');
+        const empIdInput = editForm.querySelector('[name=empId]');
+        const contactInput = editForm.querySelector('[name=contact]');
+        const addressInput = editForm.querySelector('textarea[name=address]');
         const inputs = editForm.querySelectorAll('input[type=text], textarea');
         const submitBtn = editForm.querySelector('button');
 
@@ -82,10 +99,10 @@
                 .then(user => {
                     if (!user) return;
 
-                    inputs[0].value = user.username;
-                    inputs[1].value = user.empId;
-                    inputs[2].value = user.contact;
-                    inputs[3].value = user.address;
+                    if (usernameInput) usernameInput.value = user.username;
+                    if (empIdInput) empIdInput.value = user.empId;
+                    if (contactInput) contactInput.value = user.contact;
+                    if (addressInput) addressInput.value = user.address;
 
                     inputs.forEach(i => i.setAttribute('readonly', true));
                     submitBtn.style.display = 'none';

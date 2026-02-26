@@ -41,12 +41,17 @@
                 <td th:text="${l.reason}"></td>
                 <td th:text="${l.status}"></td>
                 <td>
-                    <form th:action="@{|/admin/leaves/${l.id}/approve|}" method="post" style="display:inline">
-                        <button type="submit">Approve</button>
-                    </form>
-                    <form th:action="@{|/admin/leaves/${l.id}/reject|}" method="post" style="display:inline">
-                        <button type="submit">Reject</button>
-                    </form>
+                    <div th:if="${l.status == 'Pending'}">
+                        <form th:action="@{|/admin/leaves/${l.id}/approve|}" method="post" style="display:inline">
+                            <button type="submit">Approve</button>
+                        </form>
+                        <form th:action="@{|/admin/leaves/${l.id}/reject|}" method="post" style="display:inline">
+                            <button type="submit">Reject</button>
+                        </form>
+                    </div>
+                    <div th:if="${l.status != 'Pending'}" style="color: gray; font-weight: bold;">
+                        <span th:text="${l.status}"></span>
+                    </div>
                 </td>
             </tr>
             </tbody>
