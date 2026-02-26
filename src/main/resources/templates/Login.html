@@ -17,7 +17,7 @@
 
         <div th:if="${error}" class="error-message" th:text="${error}"></div>
 
-        <form action="/login" method="post" class="login-form" autocomplete="off">
+        <form id="loginForm" action="/login" method="post" class="login-form" autocomplete="off">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input 
@@ -53,6 +53,17 @@
         </div>
     </div>
 </div>
+
+<script src="/js/session-manager.js"></script>
+<script>
+    // Store login info in local storage when form is submitted
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const username = document.getElementById('username').value;
+        if (username) {
+            SessionManager.storeUserData(username);
+        }
+    });
+</script>
 
 </body>
 </html>
