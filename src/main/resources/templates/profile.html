@@ -2,17 +2,18 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin Profile</title>
     <link rel="stylesheet" href="/css/profile.css">
 </head>
 
 <body>
 
-
     <div class="dashboard-wrapper">
         <div class="sidebar">
             <h2>Admin Panel</h2>
-            <a href="/dashboard" class="active">Dashboard</a>
+            <a th:href="@{/dashboard}" class="active">Dashboard</a>
             <a href="/employees">Employee Management</a>
             <a href="/attendance">Attendance</a>
             <a href="/payroll">Payroll Processing</a>
@@ -22,28 +23,20 @@
         </div>
 
         <div class="main-content">
-
-
             <div class="profile-container">
+                <h2 th:if="${viewingEmployee}">Employee Profile</h2>
+                <h2 th:if="${!viewingEmployee}">Admin Profile</h2>
 
-                <h2>Admin Profile</h2>
-
-                <!-- PENCIL ICON TOP-RIGHT -->
-                <div class="edit-icon-top">✎</div>
-
-                <!-- PROFILE IMAGE -->
-                <!-- <div class="profile-image-container">
-                    <img id="profileImg"
-                        th:src="${user.profileImage != null ? '/uploads/profile/' + user.profileImage : '/images/default-user.png'}"
-                        class="profile-image">
-                </div> -->
+                <!-- PENCIL ICON TOP-RIGHT - Only show if viewing own profile -->
+                <div class="edit-icon-top" th:if="${!viewingEmployee}">✎</div>
 
                 <!-- PROFILE FORM -->
                 <form id="editForm" enctype="multipart/form-data">
-                    <!-- <input type="file" name="image" id="image-upload" hidden> -->
-
                     <label>Username</label>
                     <input type="text" name="username" th:value="${user.username}" readonly>
+
+                    <label>Employee ID</label>
+                    <input type="text" name="empId" th:value="${user.empId}" readonly>
 
                     <label>Contact</label>
                     <input type="text" name="contact" th:value="${user.contact}" readonly>
@@ -54,30 +47,27 @@
                     <button type="submit" style="display:none;">Update</button>
                 </form>
 
-                <!-- <p class="success"></p>
-                <p class="error"></p> -->
-
+                <!-- Back to Portal button if viewing employee profile -->
+                <div class="back-button" th:if="${viewingEmployee}">
+                    <a href="/portal" class="btn-back">← Back to Portal</a>
+                </div>
             </div>
-
-
         </div>
     </div>
+
     <script>
-        // const profileImg = document.getElementById('profileImg');
-        const imageInput = document.getElementById('image-upload');
         const editIcon = document.querySelector('.edit-icon-top');
         const editForm = document.getElementById('editForm');
         const inputs = editForm.querySelectorAll('input[type=text], textarea');
         const submitBtn = editForm.querySelector('button');
 
-        // Click image → open file picker
-        // profileImg.addEventListener('click', () => imageInput.click());
-
-        // Pencil icon → enable editing
-        editIcon.addEventListener('click', () => {
-            inputs.forEach(i => i.removeAttribute('readonly'));
-            submitBtn.style.display = 'block';
-        });
+        // Only enable pencil icon if it exists (own profile view)
+        if (editIcon) {
+            editIcon.addEventListener('click', () => {
+                inputs.forEach(i => i.removeAttribute('readonly'));
+                submitBtn.style.display = 'block';
+            });
+        }
 
         // AJAX form submit
         editForm.addEventListener('submit', e => {
@@ -93,12 +83,9 @@
                     if (!user) return;
 
                     inputs[0].value = user.username;
-                    inputs[1].value = user.contact;
-                    inputs[2].value = user.address;
-
-                    // if (user.profileImage) {
-                    //     profileImg.src = '/uploads/profile/' + user.profileImage + '?t=' + new Date().getTime();
-                    // }
+                    inputs[1].value = user.empId;
+                    inputs[2].value = user.contact;
+                    inputs[3].value = user.address;
 
                     inputs.forEach(i => i.setAttribute('readonly', true));
                     submitBtn.style.display = 'none';

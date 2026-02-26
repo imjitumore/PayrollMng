@@ -229,6 +229,31 @@ textarea {
     box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
 }
 
+/* Back button */
+.back-button {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.btn-back {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: #e2e8f0;
+    color: #4a5568;
+    border: 2px solid #cbd5e0;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: #cbd5e0;
+    color: #2d3748;
+    border-color: #a0aec0;
+    transform: translateX(-3px);
+}
+
 /* Messages */
 .success, .error {
     padding: 12px 20px;

@@ -26,15 +26,58 @@ public class ProfileController {
 
     // SHOW PROFILE PAGE
     @GetMapping
-    public String profilePage(HttpSession session, Model model) {
+    public String profilePage(
+            @RequestParam(value = "empId", required = false) String empIdParam,
+            HttpSession session,
+            Model model) {
         User sessionUser = (User) session.getAttribute("user");
-        if (sessionUser == null) return "redirect:/login";
+        if (sessionUser == null) {
+            return "redirect:/login";
+        }
 
-        Optional<User> userOpt = userRepository.findByUsername(sessionUser.getUsername());
-        if (userOpt.isEmpty()) return "redirect:/login";
+        User userToDisplay = null;
+        boolean viewingEmployee = false;
 
-        model.addAttribute("user", userOpt.get());
+        // If empId parameter is provided (from employee portal), show that employee's profile
+        if (empIdParam != null && !empIdParam.isEmpty()) {
+            viewingEmployee = true;
+            // Find user by empId
+            userToDisplay = findUserByEmpId(empIdParam);
+            if (userToDisplay == null) {
+                // If not found by empId, try by username (backward compatibility)
+                Optional<User> userOpt = userRepository.findByUsername(empIdParam);
+                if (userOpt.isEmpty()) {
+                    return "redirect:/login";
+                }
+                userToDisplay = userOpt.get();
+            }
+        } else {
+            // Otherwise show current logged-in user's profile
+            Optional<User> userOpt = userRepository.findByUsername(sessionUser.getUsername());
+            if (userOpt.isEmpty()) {
+                return "redirect:/login";
+            }
+            userToDisplay = userOpt.get();
+        }
+
+        model.addAttribute("user", userToDisplay);
+        model.addAttribute("viewingEmployee", viewingEmployee);
         return "profile";
+    }
+
+    // Helper method to find user by empId
+    private User findUserByEmpId(String empId) {
+        // Try to find user by empId using JPQL or Criteria API
+        // Since we don't have a direct method, we'll use findAll and filter
+        // In a real scenario, add a findByEmpId method to UserRepository
+        try {
+            return userRepository.findAll().stream()
+                    .filter(user -> user.getEmpId() != null && user.getEmpId().equals(empId))
+                    .findFirst()
+                    .orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     // UPDATE PROFILE via AJAX
@@ -47,10 +90,14 @@ public class ProfileController {
             HttpSession session
     ) {
         User sessionUser = (User) session.getAttribute("user");
-        if (sessionUser == null) return null;
+        if (sessionUser == null) {
+            return null;
+        }
 
         Optional<User> userOpt = userRepository.findByUsername(sessionUser.getUsername());
-        if (userOpt.isEmpty()) return null;
+        if (userOpt.isEmpty()) {
+            return null;
+        }
 
         User user = userOpt.get();
         user.setContact(contact);

@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Apply for Leave</title>
     <link rel="stylesheet" href="/css/attendance.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="dashboard-wrapper">
@@ -13,32 +16,80 @@
         <a href="/portal/leave-list">My Leave Requests</a>
         <a href="/portal/attendance-status">Attendance Status</a>
         <a href="/portal/salary">Salary Slip</a>
-        <a href="/profile">Profile</a>
+        
         <a href="/logout">Logout</a>
     </div>
 
     <div class="main-content">
-        <h1>Leave Application</h1>
-        <form th:action="@{/portal/apply-leave}" method="post" th:object="${leave}">
-            <input type="hidden" name="empId" th:value="${empId}" />
-            <label>From:</label>
-            <input type="date" th:field="*{fromDate}" required /> <br/>
-            <label>To:</label>
-            <input type="date" th:field="*{toDate}" required /> <br/>
-            <label>Type:</label>
-            <select th:field="*{leaveType}">
-                <option value="Casual">Casual</option>
-                <option value="Sick">Sick</option>
-            </select> <br/>
-            <label>Duration:</label>
-            <select th:field="*{duration}">
-                <option value="Full">Full</option>
-                <option value="Half">Half</option>
-            </select> <br/>
-            <label>Reason:</label>
-            <textarea th:field="*{reason}"></textarea><br/>
-            <button type="submit">Apply</button>
-        </form>
+        <div class="form-card">
+            <h1>Leave Application</h1>
+            <p class="form-subtitle">Submit a leave request for approval</p>
+            
+            <form th:action="@{/portal/apply-leave}" method="post" th:object="${leave}" class="leave-form">
+                <input type="hidden" name="empId" th:value="${empId}" />
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fromDate">From Date:</label>
+                        <input 
+                            type="date" 
+                            id="fromDate"
+                            th:field="*{fromDate}" 
+                            required 
+                            class="form-input"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="toDate">To Date:</label>
+                        <input 
+                            type="date" 
+                            id="toDate"
+                            th:field="*{toDate}" 
+                            required 
+                            class="form-input"
+                        />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="leaveType">Leave Type:</label>
+                        <select id="leaveType" th:field="*{leaveType}" class="form-select" required>
+                            <option value="">-- Select Leave Type --</option>
+                            <option value="Casual">Casual Leave</option>
+                            <option value="Sick">Sick Leave</option>
+                            <option value="Vacation">Vacation</option>
+                            <option value="Personal">Personal Leave</option>
+                            <option value="Maternity">Maternity Leave</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duration:</label>
+                        <select id="duration" th:field="*{duration}" class="form-select" required>
+                            <option value="">-- Select Duration --</option>
+                            <option value="Full">Full Day</option>
+                            <option value="Half">Half Day</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="reason">Reason for Leave:</label>
+                    <textarea 
+                        id="reason"
+                        th:field="*{reason}" 
+                        placeholder="Please provide a brief reason for your leave request..."
+                        class="form-textarea"
+                        rows="5"
+                    ></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Submit Application</button>
+                    <a href="/portal" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 </body>

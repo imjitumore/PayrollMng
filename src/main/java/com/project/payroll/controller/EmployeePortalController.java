@@ -89,8 +89,10 @@ public class EmployeePortalController {
         if (user == null) {
             return "redirect:/login";
         }
-        List<LeaveRequest> list = leaveService.getByEmpId(user.getEmpId());
+        String empId = user.getEmpId();
+        List<LeaveRequest> list = leaveService.getByEmpId(empId);
         model.addAttribute("leaves", list);
+        model.addAttribute("empId", empId);
         return "portal/leave-list";
     }
 
@@ -124,9 +126,10 @@ public class EmployeePortalController {
             days.add(ym.atDay(i));
         }
 
+        LocalDate today = LocalDate.now();
         List<DayStatus> statusList = new ArrayList<>();
         for (LocalDate d : days) {
-            String status = "Absent";
+            String status = "Pending";  // default status
             Attendance att = attendanceService.getByEmpAndDate(empId, d);
             if (att != null) {
                 if ("Present".equalsIgnoreCase(att.getStatus())) {
@@ -139,6 +142,9 @@ public class EmployeePortalController {
                     } else {
                         status = "Leave";
                     }
+                } else if ("Absent".equalsIgnoreCase(att.getStatus())) {
+                    // admin explicitly set as absent
+                    status = "Absent";
                 } else {
                     status = att.getStatus();
                 }
@@ -147,6 +153,15 @@ public class EmployeePortalController {
                 List<LeaveRequest> overlap = leaveService.findOverlapping(empId, d);
                 if (!overlap.isEmpty()) {
                     status = overlap.get(0).getStatus();
+                } else {
+                    // no attendance and no leave
+                    if (d.isBefore(today)) {
+                        // past date without attendance record = Not Filled
+                        status = "Not Filled";
+                    } else {
+                        // today or future date = Pending
+                        status = "Pending";
+                    }
                 }
             }
             statusList.add(new DayStatus(d, status));
