@@ -58,4 +58,15 @@ public class EmployeeService {
     public void deleteById(Long id) {
         repo.deleteById(id);
     }
+
+    /**
+     * Convenience method to retrieve an employee's full name using their
+     * employee identifier. Returns an empty string if no matching record
+     * is found.
+     */
+    public String getNameByEmpId(String empId) {
+        return repo.findByEmpId(empId)
+                   .map(Employee::getFullName)
+                   .orElse("");
+    }
 }

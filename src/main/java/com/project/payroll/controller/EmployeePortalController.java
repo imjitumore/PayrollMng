@@ -25,13 +25,16 @@ public class EmployeePortalController {
     private final AttendanceService attendanceService;
     private final LeaveRequestService leaveService;
     private final PayrollService payrollService;
+    private final com.project.payroll.service.EmployeeService employeeService;
 
     public EmployeePortalController(AttendanceService attendanceService,
             LeaveRequestService leaveService,
-            PayrollService payrollService) {
+            PayrollService payrollService,
+            com.project.payroll.service.EmployeeService employeeService) {
         this.attendanceService = attendanceService;
         this.leaveService = leaveService;
         this.payrollService = payrollService;
+        this.employeeService = employeeService;
     }
 
     // landing page for employee after login
@@ -55,6 +58,9 @@ public class EmployeePortalController {
         int count = attendanceService.getByEmpAndMonth(empId, start, end).size();
         model.addAttribute("myCurrentMonthAttendance", count);
         model.addAttribute("empId", empId);
+
+        // show employee name on home page
+        model.addAttribute("empName", employeeService.getNameByEmpId(empId));
 
         return "portal/home";
     }
